@@ -18,7 +18,7 @@ public class Block
 
     public String calculateHash()
     {
-        String caclculated_hash = StringUtil.applySSha256(previous_hash + Long.toString(time_data) + Integer.toString(nonce) + data);
+        String caclculated_hash = StringUtil.applySha256(previous_hash + Long.toString(time_data) + Integer.toString(nonce) + data);
         return caclculated_hash;
     }
 
