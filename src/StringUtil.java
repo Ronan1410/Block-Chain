@@ -1,3 +1,4 @@
+import com.google.gson.GsonBuilder;
 import java.security.*;
 import java.util.*;
 
@@ -55,6 +56,14 @@ public class StringUtil
             throw new RuntimeException(e);
         }
     }
+    public static String getJson(Object o)
+    {
+        return new GsonBuilder().setPrettyPrinting().create().toJson(o);
+    }
+    public static String getDificultyString(int difficulty)
+    {
+        return new String(new char[difficulty]).replace('\0', '0');
+    }
     public static String getStringFromKey(Key key)
     {
         return Base64.getEncoder().encodeToString(key.getEncoded());
@@ -70,7 +79,7 @@ public class StringUtil
         ArrayList<String> treeLayer = previousTreeLayer;
         while(count > 1)
         {
-            treeLayer  new ArrayList<String>();
+            treeLayer = new ArrayList<String>();
             for(int i = 0; i < previousTreeLayer.size(); i++)
             {
                 treeLayer.add(applySha256(previousTreeLayer.get(i-1) + previousTreeLayer.get(i)));
