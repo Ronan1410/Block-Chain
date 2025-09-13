@@ -30,7 +30,7 @@ public class BlockChain
                 return false;
             }
 
-            if(!previousBlock.hash.equals(currentBlock.hash))
+            if(!previousBlock.hash.equals(currentBlock.previous_hash))
             {
                 System.out.println("The previous hashes are not equal");
                 return false;
