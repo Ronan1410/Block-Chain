@@ -1,5 +1,6 @@
+import java.security.*;
 import java.util.*;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 
 public class BlockChain
 {
@@ -15,24 +16,21 @@ public class BlockChain
 
     public static void main(String[] args)
     {
-        blockchain.clear();
-        blockchain.add(new Block("Block 1","0"));
-        System.out.println("Trying to mine the first block");
-        blockchain.get(0).mineBlock(difficulty);
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
-        blockchain.add(new Block("Block 2",blockchain.get(blockchain.size()-1).hash));
-        System.out.println("Trying to mine the second block");
-        blockchain.get(1).mineBlock(difficulty);
+        walletA = new Wallet();
+        walletB = new Wallet();
+        Wallet coinbase = new Wallet();
 
-        blockchain.add(new Block("Block 3",blockchain.get(blockchain.size()-2).hash));
-        System.out.println("Trying to mine the third block");
-        blockchain.get(2).mineBlock(difficulty);
+        System.out.println("Private and Public Keys:");
+        System.out.println(StringUtil.getStringFromKey(walletA.privateKey));
+        System.out.println(StringUtil.getStringFromKey(walletA.publicKey));
 
-        System.out.println("\nBlcokchain Validity: "+isValid());
+        Transaction transaction = new Transaction(walletA.publicKey, walletB.publicKey,5,null);
+        transaction.generateSignature(walletA.privateKey);
 
-        String blockchainJson = new GsonBuilder().setPrettyPrinting().create().toJson(blockchain);
-        System.out.println("The BlockChain: ");
-        System.out.println(blockchainJson);
+        System.out.println("Is signature verified");
+        System.out.println(transaction.verifySignature());
     }
 
     public static boolean isValid()
