@@ -14,10 +14,42 @@ public class BlockChain
     public static Transaction genesisTransaction;
 
 
+    /*void accept()
+    {
+        Scanner sc = new Scanner(System.in);
+
+        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
+
+
+
+        genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 100f,null);
+        genesisTransaction.generateSignature(coinbase.privateKey);
+        genesisTransaction.transactionID="0";
+        genesisTransaction.outputs.add(new TransactionOutput(genesisTransaction.reciepient, genesisTransaction.value, genesisTransaction.transactionID));
+        UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
+
+
+
+        Block block1 = new Block(genesis.hash);
+        System.out.println("\nWalletA's balance: " + walletA.getBalance());
+        System.out.println("WalletA is trying to send amount to WalletB");
+        block1.addTransaction(walletA.sendFunds(walletB.publicKey, transferAmount));
+        addBlock(block1);
+        System.out.println("\nWalletA's balance: " + walletA.getBalance());
+        System.out.println("\nWalletB's balance: " + walletB.getBalance());
+
+        Block block2 = new Block(block1.hash);
+        System.out.println("\nNo sufficient funds in walletA");
+        //block2.addTransaction(walletA.sendFunds(walletB.publicKey, transferAmount));
+        addBlock(block2);
+        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
+        System.out.println("WalletB's balance is: " + walletB.getBalance());
+
+        isChainValid();
+    }*/
     public static void main(String[] args)
     {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
         walletA = new Wallet();
         walletB = new Wallet();
         Wallet coinbase = new Wallet();
@@ -33,28 +65,43 @@ public class BlockChain
         genesis.addTransaction(genesisTransaction);
         addBlock(genesis);
 
-        Block block1 = new Block(genesis.hash);
-        System.out.println("\nWalletA's balance: " + walletA.getBalance());
-        System.out.println("WalletA is trying to send amount to WalletB");
-        block1.addTransaction(walletA.sendFunds(walletB.publicKey, 40f));
-        addBlock(block1);
-        System.out.println("\nWalletA's balance: " + walletA.getBalance());
-        System.out.println("\nWalletB's balance: " + walletB.getBalance());
+        Block block = new Block(genesis.hash);
 
-        Block block2 = new Block(block1.hash);
-        System.out.println("\nWalletA Attempting to send more funds (1000) than it has...");
-        block2.addTransaction(walletA.sendFunds(walletB.publicKey, 1000f));
-        addBlock(block2);
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("WalletB's balance is: " + walletB.getBalance());
+        int key=0;
+        do
+        {
+            System.out.println("\nPress 1 to show walletA balance");
+            System.out.println("Press 2 to send amount to WalletB");
+            System.out.println("Press 3 to show walletB balance");
+            System.out.println("Press 4 to exit program");
 
-        Block block3 = new Block(block2.hash);
-        System.out.println("\nWalletB is Attempting to send funds (20) to WalletA...");
-        block3.addTransaction(walletB.sendFunds( walletA.publicKey, 20));
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("WalletB's balance is: " + walletB.getBalance());
+            Scanner sc = new Scanner(System.in);
+            key=sc.nextInt();
+            switch (key)
+            {
+                case 1:
+                    System.out.println("\nWalletA's balance: " + walletA.getBalance());
+                    break;
+                case 2:
+                    System.out.println("Enter amount to be transferred");
+                    float transferAmount = sc.nextFloat();
+                    Block block1 = new Block(block.hash);
+                    System.out.println("Sending amount");
+                    block.addTransaction(walletA.sendFunds(walletB.publicKey, transferAmount));
+                    addBlock(block1);
+                    isChainValid();
+                    break;
+                case 3:
+                    System.out.println("\nWalletB's balance: " + walletB.getBalance());
+                    break;
+                case 4:
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid key");
 
-        isChainValid();
+            }
+        }while(key!=0);
     }
 
     public static Boolean isChainValid()
@@ -90,7 +137,7 @@ public class BlockChain
                 return false;
             }
 
-            //loop thru blockchains transactions:
+            //loop through blockchains transactions:
             TransactionOutput tempOutput;
             for(int t=0; t <currentBlock.transactions.size(); t++)
             {
@@ -155,3 +202,4 @@ public class BlockChain
         blockchain.add(newBlock);
     }
 }
+

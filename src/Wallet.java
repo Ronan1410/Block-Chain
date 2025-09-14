@@ -44,29 +44,25 @@ public class Wallet
         }
         return total;
     }
-    public Transaction sendFunds(PublicKey recipient, float value)
-    {
-        if(getBalance()<value)
-        {
-            System.out.println("Insufficient funds");
+    public Transaction sendFunds(PublicKey recipient,float value ) {
+        if(getBalance() < value) {
+            System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
         ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
 
-        float total =0;
-        for(Map.Entry<String, TransactionOutput> item: UTXOs.entrySet())
-        {
+        float total = 0;
+        for (Map.Entry<String, TransactionOutput> item: UTXOs.entrySet()){
             TransactionOutput UTXO = item.getValue();
             total += UTXO.value;
             inputs.add(new TransactionInput(UTXO.id));
-            if(total >= value)
-                break;
+            if(total > value) break;
         }
-        Transaction newTransaction = new Transaction(publicKey, recipient, value, inputs);
+
+        Transaction newTransaction = new Transaction(publicKey, recipient , value, inputs);
         newTransaction.generateSignature(privateKey);
 
-        for(TransactionInput input: inputs)
-        {
+        for(TransactionInput input: inputs){
             UTXOs.remove(input.transactionOutputId);
         }
         return newTransaction;
