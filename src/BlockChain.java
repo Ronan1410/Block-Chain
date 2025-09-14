@@ -13,40 +13,6 @@ public class BlockChain
     public static Wallet walletB;
     public static Transaction genesisTransaction;
 
-
-    /*void accept()
-    {
-        Scanner sc = new Scanner(System.in);
-
-        Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
-
-
-
-        genesisTransaction = new Transaction(coinbase.publicKey, walletA.publicKey, 100f,null);
-        genesisTransaction.generateSignature(coinbase.privateKey);
-        genesisTransaction.transactionID="0";
-        genesisTransaction.outputs.add(new TransactionOutput(genesisTransaction.reciepient, genesisTransaction.value, genesisTransaction.transactionID));
-        UTXOs.put(genesisTransaction.outputs.get(0).id, genesisTransaction.outputs.get(0));
-
-
-
-        Block block1 = new Block(genesis.hash);
-        System.out.println("\nWalletA's balance: " + walletA.getBalance());
-        System.out.println("WalletA is trying to send amount to WalletB");
-        block1.addTransaction(walletA.sendFunds(walletB.publicKey, transferAmount));
-        addBlock(block1);
-        System.out.println("\nWalletA's balance: " + walletA.getBalance());
-        System.out.println("\nWalletB's balance: " + walletB.getBalance());
-
-        Block block2 = new Block(block1.hash);
-        System.out.println("\nNo sufficient funds in walletA");
-        //block2.addTransaction(walletA.sendFunds(walletB.publicKey, transferAmount));
-        addBlock(block2);
-        System.out.println("\nWalletA's balance is: " + walletA.getBalance());
-        System.out.println("WalletB's balance is: " + walletB.getBalance());
-
-        isChainValid();
-    }*/
     public static void main(String[] args)
     {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());

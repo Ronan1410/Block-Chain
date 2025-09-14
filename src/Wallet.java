@@ -1,3 +1,4 @@
+import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.ECGenParameterSpec;
 import java.util.*;
@@ -6,65 +7,81 @@ public class Wallet
 {
     public PrivateKey privateKey;
     public PublicKey publicKey;
-
-    public HashMap<String, TransactionOutput> UTXOs = new HashMap<String, TransactionOutput>();
+    public BigInteger[] latticeSecretKey;
+    public BigInteger[] latticePublicKey;
+    public HashMap<String, TransactionOutput> UTXOs = new HashMap<>();
 
     public Wallet()
     {
         generateKeyPair();
+        generateLatticeKeys();
     }
-    public void generateKeyPair()
-    {
+
+    public void generateKeyPair() {
         try
         {
-            KeyPairGenerator KeyGen = KeyPairGenerator.getInstance("ECDSA","BC");
+            KeyPairGenerator KeyGen = KeyPairGenerator.getInstance("ECDSA", "BC");
             SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
             ECGenParameterSpec ecSpec = new ECGenParameterSpec("prime192v1");
-            KeyGen.initialize(ecSpec,random);
+            KeyGen.initialize(ecSpec, random);
             KeyPair keyPair = KeyGen.generateKeyPair();
             privateKey = keyPair.getPrivate();
             publicKey = keyPair.getPublic();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             throw new RuntimeException(e);
         }
     }
+
+    public void generateLatticeKeys()
+    {
+        latticeSecretKey = LatticeEncryption.generateSecretKey();
+        latticePublicKey = LatticeEncryption.generatePublicKey(latticeSecretKey);
+    }
+
     public float getBalance()
     {
-        float total =0;
-        for(Map.Entry<String, TransactionOutput> item: BlockChain.UTXOs.entrySet())
+        float total = 0;
+        for (Map.Entry<String, TransactionOutput> item : BlockChain.UTXOs.entrySet())
         {
             TransactionOutput UTXO = item.getValue();
-            if(UTXO.isMine(publicKey))
+            if (UTXO.isMine(publicKey))
             {
-                UTXOs.put(UTXO.id,UTXO);
+                UTXOs.put(UTXO.id, UTXO);
                 total += UTXO.value;
             }
         }
         return total;
     }
-    public Transaction sendFunds(PublicKey recipient,float value ) {
-        if(getBalance() < value) {
+
+    public Transaction sendFunds(PublicKey recipient, float value)
+    {
+        if (getBalance() < value)
+        {
             System.out.println("#Not Enough funds to send transaction. Transaction Discarded.");
             return null;
         }
-        ArrayList<TransactionInput> inputs = new ArrayList<TransactionInput>();
 
+        ArrayList<TransactionInput> inputs = new ArrayList<>();
         float total = 0;
-        for (Map.Entry<String, TransactionOutput> item: UTXOs.entrySet()){
+        for (Map.Entry<String, TransactionOutput> item : UTXOs.entrySet())
+        {
             TransactionOutput UTXO = item.getValue();
             total += UTXO.value;
             inputs.add(new TransactionInput(UTXO.id));
-            if(total > value) break;
+            if (total > value) break;
         }
 
-        Transaction newTransaction = new Transaction(publicKey, recipient , value, inputs);
+        Transaction newTransaction = new Transaction(publicKey, recipient, value, inputs);
         newTransaction.generateSignature(privateKey);
+        newTransaction.setEncryptedFlag(latticePublicKey, latticeSecretKey, 1); // mark as valid
 
-        for(TransactionInput input: inputs){
+        for (TransactionInput input : inputs)
+        {
             UTXOs.remove(input.transactionOutputId);
         }
+
         return newTransaction;
     }
 }
